@@ -1,0 +1,32 @@
+name: Generate Blog
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # runs daily at 6 AM IST
+  workflow_dispatch:       # allow manual run
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run blog writer
+      run: python src/ai_blog_writer.py
+
+    - name: Commit blog
+      run: |
+        git config --local user.name "github-actions"
+        git config --local user.email "actions@github.com"
+        git add .
+        git commit -m "New blog generated"
+        git push
